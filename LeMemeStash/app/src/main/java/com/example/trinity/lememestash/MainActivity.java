@@ -17,6 +17,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -24,6 +25,8 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,14 +34,18 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_READ_EXTERNAL_STORAGE = 666;
 
     private GridView memeGrid;
+    private MemeAdapter memeAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        memeAdapter = new MemeAdapter(getBaseContext(), 0);
+
         FloatingActionButton fab = findViewById(R.id.fab);
         memeGrid = findViewById(R.id.meme_grid);
+        memeGrid.setAdapter(memeAdapter);
 
         fab.setOnClickListener(view -> {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
@@ -72,8 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Bitmap result) {
-                Bitmap resized = ThumbnailUtils.extractThumbnail(result, 100, 100);
-                ((ImageView)findViewById(R.id.image1)).setImageBitmap(resized);
+                Bitmap resized = ThumbnailUtils.extractThumbnail(result, 500, 500);
+                Meme newMeme = new Meme();
+                newMeme.thumbnail = resized;
+                memeAdapter.add(newMeme);
             }
         };
 
