@@ -3,25 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace MemeStasher.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
-    {
-        // GET api/values
+    public class MemesController : Controller
+    {        
+        SHA256 hasher = SHA256.Create();
+
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+//         [HttpGet("{sha}")]
+//         public ActionResult Get(string sha)
+//         {
+//             if (!IsHashValid(sha)) {
+//                 return BadRequest();
+//             }
+
+// //            return File()
+//         }
 
         // POST api/values
         [HttpPost]
@@ -39,6 +44,14 @@ namespace MemeStasher.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private char[] validHashChars = Enumerable.Range((short)'a', (short)'z' - (short)'a').Select(i => (char)i)
+                                            .Concat(
+                                        Enumerable.Range(0, 10).Select(i => i.ToString()[0]))
+                                            .ToArray();
+        private bool IsHashValid(string sha) {
+            return sha.All(x => validHashChars.Contains(x));
         }
     }
 }
